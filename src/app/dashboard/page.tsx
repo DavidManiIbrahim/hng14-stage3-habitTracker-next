@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { getSession, clearSession } from '@/lib/auth';
 import { getUserHabits, createHabit, updateHabit, deleteHabit, toggleHabitCompletion } from '@/lib/habits';
-import { Habit, HabitPriority } from '@/types/habit';
+import { Habit } from '@/types/habit';
 import { HabitList } from '@/components/habits/HabitList';
 import HabitForm from '@/components/habits/HabitForm';
 import { ProtectedRoute } from '@/components/shared/ProtectedRoute';
@@ -35,8 +35,6 @@ export default function DashboardPage() {
   const handleCreateHabit = (data: {
     name: string;
     description: string;
-    priority: HabitPriority;
-    dueDate: string;
   }) => {
     const session = getSession();
     if (!session) return;
@@ -46,8 +44,6 @@ export default function DashboardPage() {
       name: data.name,
       description: data.description,
       frequency: 'daily',
-      priority: data.priority,
-      dueDate: data.dueDate,
     });
 
     setShowForm(false);
