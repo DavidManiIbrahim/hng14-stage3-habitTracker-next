@@ -1,3 +1,4 @@
+import { vi } from 'vitest';
 import '@testing-library/jest-dom';
 
 // Mock Next.js navigation
@@ -24,10 +25,10 @@ const localStorageMock = (() => {
 Object.defineProperty(window, 'localStorage', { value: localStorageMock });
 
 // Mock crypto.randomUUID
-if (!global.crypto) {
-  global.crypto = {} as Crypto;
+if (!(global as any).crypto) {
+  (global as any).crypto = {} as any;
 }
-global.crypto.randomUUID = () => 
+(global as any).crypto.randomUUID = () =>
   'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
     const r = Math.random() * 16 | 0;
     const v = c === 'x' ? r : (r & 0x3 | 0x8);
