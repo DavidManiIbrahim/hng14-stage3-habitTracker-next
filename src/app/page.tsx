@@ -1,34 +1,23 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import SplashScreen from '@/components/shared/SplashScreen';
 import { getSession } from '@/lib/auth';
 
+const SPLASH_DURATION_MS = 1200;
+
 export default function HomePage() {
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const checkSession = async () => {
-      // Show splash for 800ms-2000ms
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+    const timeoutId = window.setTimeout(() => {
       const session = getSession();
-      if (session) {
-        router.push('/dashboard');
-      } else {
-        router.push('/login');
-      }
-      setIsLoading(false);
-    };
+      router.replace(session ? '/dashboard' : '/login');
+    }, SPLASH_DURATION_MS);
 
-    checkSession();
+    return () => window.clearTimeout(timeoutId);
   }, [router]);
-
-  if (isLoading) {
-    return <SplashScreen />;
-  }
 
   return <SplashScreen />;
 }

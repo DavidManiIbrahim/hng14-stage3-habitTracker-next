@@ -3,11 +3,14 @@
 import { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 import { validateHabitName } from '@/lib/validators';
+import { HabitPriority } from '@/types/habit';
 
 interface HabitFormProps {
   onSubmit: (data: {
     name: string;
     description: string;
+    priority: HabitPriority;
+    dueDate: string;
   }) => void;
   onCancel: () => void;
 }
@@ -15,6 +18,8 @@ interface HabitFormProps {
 export default function HabitForm({ onSubmit, onCancel }: HabitFormProps) {
   const [habitName, setHabitName] = useState('');
   const [habitDescription, setHabitDescription] = useState('');
+  const [priority, setPriority] = useState<HabitPriority>('medium');
+  const [dueDate, setDueDate] = useState<string>(new Date().toISOString().slice(0, 10));
   const [formError, setFormError] = useState('');
 
   useEffect(() => {
@@ -38,6 +43,8 @@ export default function HabitForm({ onSubmit, onCancel }: HabitFormProps) {
     onSubmit({
       name: validation.value,
       description: habitDescription,
+      priority,
+      dueDate,
     });
   };
 
@@ -114,6 +121,37 @@ export default function HabitForm({ onSubmit, onCancel }: HabitFormProps) {
             >
               <option value="daily">Daily</option>
             </select>
+          </div>
+
+          <div>
+            <label htmlFor="habit-priority" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Priority
+            </label>
+            <select
+              id="habit-priority"
+              data-testid="habit-priority-select"
+              value={priority}
+              onChange={(e) => setPriority(e.target.value as HabitPriority)}
+              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700"
+            >
+              <option value="low">Low</option>
+              <option value="medium">Medium</option>
+              <option value="high">High</option>
+            </select>
+          </div>
+
+          <div>
+            <label htmlFor="habit-due-date" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Due Date
+            </label>
+            <input
+              id="habit-due-date"
+              type="date"
+              data-testid="habit-due-date-input"
+              value={dueDate}
+              onChange={(e) => setDueDate(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700"
+            />
           </div>
         </div>
 

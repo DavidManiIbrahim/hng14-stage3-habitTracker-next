@@ -3,7 +3,13 @@ import { getItem, setItem } from './storage';
 import { HABITS_KEY } from './constants';
 
 export function getHabits(): Habit[] {
-  return getItem<Habit[]>(HABITS_KEY) || [];
+  const items = getItem<Habit[]>(HABITS_KEY) || [];
+  // Backward-compat: ensure new Habit fields exist
+  return items.map(h => ({
+    ...h,
+    priority: (h as any).priority ?? 'medium',
+    dueDate: (h as any).dueDate ?? new Date().toISOString().slice(0, 10),
+  }));
 }
 
 export function saveHabits(habits: Habit[]): void {
