@@ -5,33 +5,31 @@ export function calculateCurrentStreak(completions: string[], today?: string): n
     return 0;
   }
   
-  // Remove duplicates
-  const uniqueCompletions = [...new Set(completions)];
-  
-  // Sort by date (ascending)
-  const sorted = [...uniqueCompletions].sort();
+  // Remove duplicates and sort ascending
+  const uniqueCompletions = [...new Set(completions)].sort();
   
   // Check if today is completed
-  if (!sorted.includes(todayDate)) {
+  if (!uniqueCompletions.includes(todayDate)) {
     return 0;
   }
   
-  // Count consecutive days backwards from today
-  let streak = 0;
-  let currentDate = new Date(todayDate);
-  currentDate.setHours(0, 0, 0, 0);
+  // Find the index of today
+  const todayIndex = uniqueCompletions.indexOf(todayDate);
   
-  // Work backwards from today
-  for (let i = 0; i < sorted.length; i++) {
-    const completionDate = new Date(sorted[sorted.length - 1 - i]);
-    completionDate.setHours(0, 0, 0, 0);
+  // Count consecutive days from today going backwards
+  // IMPORTANT: Each date must be exactly one day before the previous
+  let streak = 0;
+  let expectedDate = new Date(todayDate);
+  
+  for (let i = todayIndex; i >= 0; i--) {
+    const completionDate = uniqueCompletions[i];
+    const expectedDateStr = expectedDate.toISOString().split('T')[0];
     
-    if (completionDate.getTime() === currentDate.getTime()) {
+    if (completionDate === expectedDateStr) {
       streak++;
-      // Move to previous day
-      currentDate.setDate(currentDate.getDate() - 1);
-    } else if (completionDate.getTime() < currentDate.getTime()) {
-      // Gap found, streak is broken
+      expectedDate.setDate(expectedDate.getDate() - 1);
+    } else {
+      // Gap found - streak is broken
       break;
     }
   }

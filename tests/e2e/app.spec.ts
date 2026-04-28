@@ -105,9 +105,7 @@ test.describe('Habit Tracker app', () => {
   });
 
   test('completes a habit for today and updates the streak', async ({ page }) => {
-    const today = new Date().toISOString().split('T')[0];
-    
-    // Set up authenticated session with a habit
+    // Set up authenticated session
     await page.addInitScript(() => {
       localStorage.setItem('habit-tracker-session', JSON.stringify({
         userId: 'user-1',
@@ -119,31 +117,26 @@ test.describe('Habit Tracker app', () => {
         password: 'password123',
         createdAt: '2024-01-01T00:00:00.000Z'
       }]));
-      localStorage.setItem('habit-tracker-habits', JSON.stringify([{
-        id: 'habit-1',
-        userId: 'user-1',
-        name: 'Drink Water',
-        description: 'Drink 8 glasses daily',
-        frequency: 'daily',
-        createdAt: '2024-01-01T00:00:00.000Z',
-        completions: [today]
-      }]));
     });
     
     await page.goto('/dashboard');
     
-    // Wait for the dashboard to fully load
+    // Wait for dashboard to load
     await expect(page.getByTestId('dashboard-page')).toBeVisible({ timeout: 10000 });
     
-    // Wait for React to render the habits
-    await page.waitForTimeout(2000);
+    // Click add habit button - same as working test
+    await page.getByTestId('create-habit-button').click();
     
-    // Debug: Check if any habit card exists
-    const habitCards = await page.locator('[data-testid^="habit-card-"]').count();
-    console.log('Habit cards found:', habitCards);
+    // Fill in habit form - same as working test
+    await page.getByTestId('habit-name-input').fill('Drink Water');
+    await page.getByTestId('habit-description-input').fill('Drink 8 glasses daily');
+    await page.getByTestId('habit-save-button').click();
     
-    // Should show the habit card
-    await expect(page.getByTestId('habit-card-drink-water')).toBeVisible({ timeout: 5000 });
+    // Should show the habit card - same assertion as working test
+    await expect(page.getByTestId('habit-card-drink-water')).toBeVisible();
+    
+    // Now complete the habit for today
+    await page.getByTestId('habit-complete-drink-water').click();
     
     // Should show streak of 1
     await expect(page.getByTestId('habit-streak-drink-water')).toContainText('1 day');
