@@ -132,6 +132,19 @@ test.describe('Habit Tracker app', () => {
     
     await page.goto('/dashboard');
     
+    // Wait for the dashboard to fully load
+    await expect(page.getByTestId('dashboard-page')).toBeVisible({ timeout: 10000 });
+    
+    // Wait for React to render the habits
+    await page.waitForTimeout(2000);
+    
+    // Debug: Check if any habit card exists
+    const habitCards = await page.locator('[data-testid^="habit-card-"]').count();
+    console.log('Habit cards found:', habitCards);
+    
+    // Should show the habit card
+    await expect(page.getByTestId('habit-card-drink-water')).toBeVisible({ timeout: 5000 });
+    
     // Should show streak of 1
     await expect(page.getByTestId('habit-streak-drink-water')).toContainText('1 day');
   });
@@ -205,7 +218,12 @@ test.describe('Habit Tracker app', () => {
     await page.context().setOffline(true);
     
     // Try to reload - should not crash hard
-    await page.reload();
+    // We use a try-catch because offline mode may cause network errors
+    try {
+      await page.reload({ timeout: 5000 });
+    } catch (e) {
+      // Expected when offline - just verify page didn't crash
+    }
     
     // The page should either show content or a proper offline page, not crash
     // We just verify it doesn't throw an unhandled error

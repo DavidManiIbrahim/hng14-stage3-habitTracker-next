@@ -118,7 +118,7 @@ export function HabitCard({ habit, onUpdate, onDelete, onToggleComplete }: Habit
               className="flex items-center gap-1 bg-orange-50 dark:bg-orange-900/10 text-orange-600 dark:text-orange-400 px-2 py-1 rounded-lg text-xs font-bold"
             >
               <Flame size={14} className="fill-orange-500" />
-              {streak} streak
+              {streak} {streak === 1 ? 'day' : 'days'}
             </span>
           </div>
           {habit.description && (

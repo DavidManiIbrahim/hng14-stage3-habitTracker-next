@@ -8,7 +8,7 @@ export function calculateCurrentStreak(completions: string[], today?: string): n
   // Remove duplicates
   const uniqueCompletions = [...new Set(completions)];
   
-  // Sort by date
+  // Sort by date (ascending)
   const sorted = [...uniqueCompletions].sort();
   
   // Check if today is completed
@@ -19,20 +19,18 @@ export function calculateCurrentStreak(completions: string[], today?: string): n
   // Count consecutive days backwards from today
   let streak = 0;
   let currentDate = new Date(todayDate);
+  currentDate.setHours(0, 0, 0, 0);
   
-  for (let i = sorted.length - 1; i >= 0; i--) {
-    const completionDate = new Date(sorted[i]);
-    const expectedDate = new Date(currentDate);
-    
-    // Reset time to compare dates only
-    expectedDate.setHours(0, 0, 0, 0);
+  // Work backwards from today
+  for (let i = 0; i < sorted.length; i++) {
+    const completionDate = new Date(sorted[sorted.length - 1 - i]);
     completionDate.setHours(0, 0, 0, 0);
     
-    if (completionDate.getTime() === expectedDate.getTime()) {
+    if (completionDate.getTime() === currentDate.getTime()) {
       streak++;
       // Move to previous day
       currentDate.setDate(currentDate.getDate() - 1);
-    } else if (completionDate.getTime() < expectedDate.getTime()) {
+    } else if (completionDate.getTime() < currentDate.getTime()) {
       // Gap found, streak is broken
       break;
     }

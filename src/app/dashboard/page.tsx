@@ -14,6 +14,7 @@ export default function DashboardPage() {
   const router = useRouter();
   const [habits, setHabits] = useState<Habit[]>([]);
   const [showForm, setShowForm] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     loadHabits();
@@ -25,6 +26,7 @@ export default function DashboardPage() {
       const userHabits = getUserHabits(session.userId);
       setHabits(userHabits);
     }
+    setLoading(false);
   };
 
   const handleLogout = () => {
