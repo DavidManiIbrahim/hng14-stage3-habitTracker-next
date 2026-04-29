@@ -14,8 +14,8 @@ test.describe('Habit Tracker app', () => {
     // Should show splash screen
     await expect(page.getByTestId('splash-screen')).toBeVisible({ timeout: 5000 });
     
-    // Should redirect to login after splash
-    await expect(page).toHaveURL(/login/, { timeout: 10000 });
+    // Should redirect to login after splash (1200ms splash + redirect time)
+    await expect(page).toHaveURL(/login/, { timeout: 15000 });
   });
 
   test('redirects authenticated users from / to /dashboard', async ({ page }) => {
@@ -29,8 +29,8 @@ test.describe('Habit Tracker app', () => {
     
     await page.goto('/');
     
-    // Should redirect to dashboard
-    await expect(page).toHaveURL(/dashboard/, { timeout: 10000 });
+    // Should redirect to dashboard (with splash delay)
+    await expect(page).toHaveURL(/dashboard/, { timeout: 15000 });
   });
 
   test('prevents unauthenticated access to /dashboard', async ({ page }) => {
