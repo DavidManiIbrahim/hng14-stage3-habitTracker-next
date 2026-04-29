@@ -11,18 +11,20 @@ vi.mock('next/navigation', () => ({
   usePathname: () => '/',
 }));
 
-// Mock localStorage
-const localStorageMock = (() => {
-  let store: Record<string, string> = {};
-  return {
-    getItem: (key: string) => store[key] || null,
-    setItem: (key: string, value: string) => { store[key] = value; },
-    removeItem: (key: string) => { delete store[key]; },
-    clear: () => { store = {}; },
-  };
-})();
+// Mock localStorage - only in browser environment
+if (typeof window !== 'undefined') {
+  const localStorageMock = (() => {
+    let store: Record<string, string> = {};
+    return {
+      getItem: (key: string) => store[key] || null,
+      setItem: (key: string, value: string) => { store[key] = value; },
+      removeItem: (key: string) => { delete store[key]; },
+      clear: () => { store = {}; },
+    };
+  })();
 
-Object.defineProperty(window, 'localStorage', { value: localStorageMock });
+  Object.defineProperty(window, 'localStorage', { value: localStorageMock });
+}
 
 // Mock crypto.randomUUID
 if (!(global as any).crypto) {

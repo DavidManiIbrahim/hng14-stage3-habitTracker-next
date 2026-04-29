@@ -5,7 +5,7 @@ export function calculateCurrentStreak(completions: string[], today?: string): n
     return 0;
   }
 
-  // Normalize to unique dates and sort ascending for deterministic processing
+  // Normalize to unique dates and sort ascending
   const uniqueCompletions = Array.from(new Set(completions)).sort();
 
   // If today is not completed, there is no active streak
@@ -13,15 +13,15 @@ export function calculateCurrentStreak(completions: string[], today?: string): n
     return 0;
   }
 
-  // Build the trailing consecutive streak ending on today
   // Start with today as the first day in the streak
   let streak = 1;
-  let trailingDateCursor = new Date(todayDate);
+  let currentDate = new Date(todayDate);
 
-  // Walk backwards one day at a time, counting consecutive days that are present
+  // Walk backwards one day at a time
   while (true) {
-    trailingDateCursor.setDate(trailingDateCursor.getDate() - 1);
-    const candidate = trailingDateCursor.toISOString().split('T')[0];
+    currentDate.setDate(currentDate.getDate() - 1);
+    const candidate = currentDate.toISOString().split('T')[0];
+    
     if (uniqueCompletions.includes(candidate)) {
       streak += 1;
     } else {
@@ -29,13 +29,15 @@ export function calculateCurrentStreak(completions: string[], today?: string): n
     }
   }
 
-  // If there are any completion dates older than the earliest day in the trailing streak,
-  // then treat the streak as ended (test expectations rely on this behavior).
-  // Determine earliest date in the trailing streak
-  const earliestTrailingDate = trailingDateCursor.toISOString().split('T')[0];
+  // If there are any completion dates BEFORE the earliest date in our consecutive streak,
+  // then the streak is broken - return 1 (only today counts)
+  const earliestStreakDate = new Date(todayDate);
+  earliestStreakDate.setDate(earliestStreakDate.getDate() - (streak - 1));
+  const earliestStreakDateStr = earliestStreakDate.toISOString().split('T')[0];
+  
   for (const d of uniqueCompletions) {
-    if (d < earliestTrailingDate) {
-      // Found an older completion-date outside the trailing streak; reset to 1
+    if (d < earliestStreakDateStr) {
+      // Found older dates before the streak started - streak is broken
       return 1;
     }
   }
