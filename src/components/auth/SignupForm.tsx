@@ -36,7 +36,6 @@ export default function SignupForm() {
     <form onSubmit={handleSubmit} className="space-y-5">
       {error && (
         <div className="bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 p-3 rounded-lg text-sm flex items-center gap-2">
-          <div className="w-1 h-4 bg-red-600 rounded-full" />
           {error}
         </div>
       )}
@@ -56,7 +55,7 @@ export default function SignupForm() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             className="w-full pl-10 pr-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white transition-all outline-none"
-            placeholder="name@example.com"
+            placeholder="name@gmail.com"
             required
           />
         </div>
@@ -92,14 +91,7 @@ export default function SignupForm() {
         Create Account
       </button>
 
-      {/* <div className="relative py-4">
-        <div className="absolute inset-0 flex items-center">
-          <div className="w-full border-t border-gray-200 dark:border-gray-700"></div>
-        </div>
-        <div className="relative flex justify-center text-sm">
-          <span className="px-2 bg-white dark:bg-gray-800 text-gray-500">Or join with</span>
-        </div>
-      </div> */}
+
 
       <p className="text-center text-gray-600 dark:text-gray-400 text-sm">
         Already have an account?{' '}

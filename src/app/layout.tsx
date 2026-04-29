@@ -1,6 +1,4 @@
-'use client';
 
-import { useEffect } from 'react';
 import './globals.css';
 
 export default function RootLayout({
@@ -8,23 +6,9 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  useEffect(() => {
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js').then(
-          (registration) => {
-            console.log('SW registered: ', registration);
-          },
-          (registrationError) => {
-            console.log('SW registration failed: ', registrationError);
-          }
-        );
-      });
-    }
-  }, []);
 
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <title>Habit Tracker</title>
         <meta name="description" content="Track your daily habits" />
@@ -38,4 +22,4 @@ export default function RootLayout({
       </body>
     </html>
   );
-}
+}
