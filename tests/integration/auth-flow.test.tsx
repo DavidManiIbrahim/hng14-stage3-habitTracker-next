@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import LoginForm from '@/components/auth/LoginForm';
@@ -12,27 +12,29 @@ vi.mock('next/navigation', () => ({
   }),
 }));
 
-// Mock storage and session functions
-vi.mock('@/lib/habits', async () => {
-  const actual = await vi.importActual('@/lib/habits');
-  return {
-    ...actual as any,
-    findUserByEmail: vi.fn(),
-    createUser: vi.fn(),
-    setSession: vi.fn(),
-  };
-});
+// Mock auth module (used by SignupForm and LoginForm)
+const mockFindUserByEmail = vi.fn();
+const mockCreateUser = vi.fn();
+const mockSetSession = vi.fn();
+
+vi.mock('@/lib/auth', () => ({
+  findUserByEmail: (...args: any[]) => mockFindUserByEmail(...args),
+  createUser: (...args: any[]) => mockCreateUser(...args),
+  setSession: (...args: any[]) => mockSetSession(...args),
+}));
 
 describe('auth flow', () => {
   beforeEach(() => {
     mockPush.mockClear();
+    mockFindUserByEmail.mockClear();
+    mockCreateUser.mockClear();
+    mockSetSession.mockClear();
   });
 
   it('submits the signup form and creates a session', async () => {
-    const { findUserByEmail, createUser, setSession } = await import('@/lib/habits');
-
-    vi.mocked(findUserByEmail).mockReturnValue(null);
-    vi.mocked(createUser).mockReturnValue({
+    // Setup mock returns for this test
+    mockFindUserByEmail.mockReturnValue(null);
+    mockCreateUser.mockReturnValue({
       id: '1',
       email: 'test@example.com',
       password: 'password',
@@ -54,8 +56,8 @@ describe('auth flow', () => {
     fireEvent.click(screen.getByTestId('auth-signup-submit'));
 
     await waitFor(() => {
-      expect(createUser).toHaveBeenCalledWith('test@example.com', 'password');
-      expect(setSession).toHaveBeenCalledWith({
+      expect(mockCreateUser).toHaveBeenCalledWith('test@example.com', 'password');
+      expect(mockSetSession).toHaveBeenCalledWith({
         userId: '1',
         email: 'test@example.com',
       });
@@ -64,9 +66,8 @@ describe('auth flow', () => {
   });
 
   it('shows an error for duplicate signup email', async () => {
-    const { findUserByEmail } = await import('@/lib/habits');
-
-    vi.mocked(findUserByEmail).mockReturnValue({
+    // Setup mock to return existing user
+    mockFindUserByEmail.mockReturnValue({
       id: '1',
       email: 'test@example.com',
       password: 'password',
@@ -93,9 +94,8 @@ describe('auth flow', () => {
   });
 
   it('submits the login form and stores the active session', async () => {
-    const { findUserByEmail, setSession } = await import('@/lib/habits');
-
-    vi.mocked(findUserByEmail).mockReturnValue({
+    // Setup mock to return user on login
+    mockFindUserByEmail.mockReturnValue({
       id: '1',
       email: 'test@example.com',
       password: 'password',
@@ -117,7 +117,7 @@ describe('auth flow', () => {
     fireEvent.click(screen.getByTestId('auth-login-submit'));
 
     await waitFor(() => {
-      expect(setSession).toHaveBeenCalledWith({
+      expect(mockSetSession).toHaveBeenCalledWith({
         userId: '1',
         email: 'test@example.com',
       });
@@ -126,9 +126,8 @@ describe('auth flow', () => {
   });
 
   it('shows an error for invalid login credentials', async () => {
-    const { findUserByEmail } = await import('@/lib/habits');
-
-    vi.mocked(findUserByEmail).mockReturnValue(null);
+    // Setup mock to return null (user not found)
+    mockFindUserByEmail.mockReturnValue(null);
 
     render(
       <BrowserRouter>
@@ -137,7 +136,7 @@ describe('auth flow', () => {
     );
 
     fireEvent.change(screen.getByTestId('auth-login-email'), {
-      target: { value: 'test@example.com' },
+      target: { value: 'nonexistent@example.com' },
     });
     fireEvent.change(screen.getByTestId('auth-login-password'), {
       target: { value: 'password' },

@@ -10,16 +10,25 @@ interface ProtectedRouteProps {
 
 export function ProtectedRoute({ children }: ProtectedRouteProps) {
   const router = useRouter();
-  const [isAuthorized, setIsAuthorized] = useState(true); // Default to true to show content
+  const [isAuthorized, setIsAuthorized] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    // Check session immediately on mount
     const session = getSession();
     if (!session) {
       router.push('/login');
+      setIsLoading(false);
     } else {
       setIsAuthorized(true);
+      setIsLoading(false);
     }
   }, [router]);
+
+  if (isLoading) {
+    // Show nothing while checking auth
+    return null;
+  }
 
   if (!isAuthorized) {
     // Show nothing while redirecting

@@ -9,16 +9,9 @@ const SPLASH_DURATION_MS = 1200;
 
 export default function HomePage() {
   const router = useRouter();
-  const [ready, setReady] = useState(false);
+  const [showSplash, setShowSplash] = useState(true);
 
   useEffect(() => {
-    // Ensure we're on the client side
-    setReady(true);
-  }, []);
-
-  useEffect(() => {
-    if (!ready) return;
-
     const timer = setTimeout(() => {
       // Get session on client side only
       let session = null;
@@ -29,15 +22,11 @@ export default function HomePage() {
       }
 
       const destination = session ? '/dashboard' : '/login';
-      
-      // Use window.location for more reliable redirect
-      if (typeof window !== 'undefined') {
-        window.location.href = destination;
-      }
+      router.push(destination);
     }, SPLASH_DURATION_MS);
 
     return () => clearTimeout(timer);
-  }, [ready]);
+  }, [router]);
 
   return <SplashScreen />;
 }
